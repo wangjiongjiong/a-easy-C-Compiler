@@ -9,25 +9,32 @@ int poolsize;           //默认文本，数据，栈的大小
 int line;               //line number
 
 
+/* 词法分析模块 */
 void next()
 {
     token = *src++;
     return;
 }
 
-void expression(int level) {
+
+/* 解析表达式 */
+void expression(int level) 
+{
     // do nothing
 }
 
-void program() {
+/* 语法分析模块 */
+void program() 
+{
     next();                  // 获取到下一个token
-    while (token > 0) {
+    while (token > 0) 
+    {
         printf("token is: %c\n", token);
         next();
     }
 }
 
-
+/* 虚拟机模块 */
 int eval() { // do nothing yet
     return 0;
 }
@@ -42,18 +49,23 @@ int main(int argc, char **argv)
     poolsize = 256 * 1024; // 任意大小即可
     line = 1;
 
-    if ((fd = open(*argv, 0)) < 0) {
+    /* open打开想要读取的源代码 */
+    if ((fd = open(*argv, 0)) < 0) 
+    {
         printf("could not open(%s)\n", *argv);
         return -1;
     }
 
-    if (!(src = old_src = malloc(poolsize))) {
+    /* malloc出来源代码的数据缓冲区 */
+    if (!(src = old_src = malloc(poolsize))) 
+    {
         printf("could not malloc(%d) for source area\n", poolsize);
         return -1;
     }
 
     // 读取c语言源代码
-    if ((i = read(fd, src, poolsize-1)) <= 0) {
+    if ((i = read(fd, src, poolsize-1)) <= 0) 
+    {
         printf("read() returned %d\n", i);
         return -1;
     }
