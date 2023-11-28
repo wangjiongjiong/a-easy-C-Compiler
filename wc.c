@@ -212,16 +212,7 @@ int eval()
             printf("unknow instruction%d\n",op);
             return -1;
         }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+          
     }
     
     return 0;
