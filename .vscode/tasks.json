@@ -13,7 +13,7 @@
             "-o",
             "${fileDirname}\\${fileBasenameNoExtension}.exe",
             "-I",
-            "D:\\vscode_code\\C_C++_code\\c_complier\\a-easy-C-Complier",      /*修改成自己放c/c++项目的文件夹，这里的路径和电脑里复制的文件目录有一点不一样，这里是两个反斜杠\\*/
+            "D:\\vscode_code\\C_C++_code\\c_compiler\\a-easy-C-Compiler",      /*修改成自己放c/c++项目的文件夹，这里的路径和电脑里复制的文件目录有一点不一样，这里是两个反斜杠\\*/
             "-std=c++17"
         ],
         "options": {
