@@ -3,6 +3,8 @@
 #include <memory.h>
 #include <string.h>
 
+#define int long long
+
 /* 初始化指针声明 */
 int token;              //当前的token
 char *src , *old_src;   //指向源代码字符串的指针
@@ -55,6 +57,7 @@ int eval()
     int op, *tmp;
     while (1)
     {
+        op = *pc++;
         if(op == IMM)
         {
             //存储一个立即数
@@ -81,131 +84,158 @@ int eval()
         }
         else if (op == PUSH)
         {
-            /* code */
+            //将ax的值放入栈中
+            *--sp = ax;
         }
         else if (op == JMP)
         {
-            /* code */
+            //无条件跳转地址，将pc中的值设为地址
+            pc = (int *)*pc;
         }
         else if (op == JZ)
         {
-            /* code */
+            //判断ax中的值是否为0若为0则跳转到指定地址
+            pc = ax ? pc + 1 : (int *)*pc;
         }
         else if (op == JNZ)
         {
-            /* code */
+            //判断ax中的值是否不为0若不为0则跳转到指定地址
+            pc = ax ? (int*)*pc : pc + 1; 
+        }
+        else if (op == CALL)
+        {
+            //跳转到子函数的地址
+            *--sp = (int)(pc+1);
+            pc = (int *)*pc;
         }
         else if (op == ENT)
         {
-            /* code */
+            //保存当前栈指针，并在栈上保留一定的空间
+            *--sp = (int)bp;
+            bp = sp;
+            sp = sp - *pc++;
         }
         else if (op == ADJ)
         {
-            /* code */
+            //清除子函数入栈的数据
+            sp = sp + *pc++;
+        }
+        else if (op == LEV)
+        {
+            //还原原来函数的pc等信息
+            sp = bp;
+            bp = (int *)sp++;
+            pc = (int *)sp++;
         }
         else if (op == LEA)
         {
-            /* code */
-        }
-        else if (op == LEA)
-        {
-            /* code */
+            ax = (int)(bp + *pc++);
         }
         else if (op == OR)
         {
-            /* code */
+            ax = *sp++ | ax;
         }
         else if (op == XOR)
         {
-            /* code */
+            ax = *sp++ ^ ax;
         }
         else if (op == AND)
         {
-            /* code */
+            ax = *sp++ & ax;
         }
         else if (op == EQ)
         {
-            /* code */
+            ax = *sp++ == ax;
         }
         else if (op == NE)
         {
-            /* code */
+            ax = *sp++ != ax;
         }
         else if (op == LT)
         {
-            /* code */
+            ax = *sp++ < ax;
         }
         else if (op == LE)
         {
-            /* code */
+            ax = *sp++ <= ax;
         }
         else if (op == GT)
         {
-            /* code */
+            ax = *sp++ > ax;
         }
         else if (op == GE)
         {
-            /* code */
+            ax = *sp++ >= ax;
         }
         else if (op == SHL)
         {
-            /* code */
+            ax = *sp++ << ax;
         }
         else if (op == SHR)
         {
-            /* code */
+            ax = *sp++ >> ax;
         }
         else if (op == ADD)
         {
-            /* code */
+            ax = *sp++ + ax;
         }
         else if (op == SUB)
         {
-            /* code */
+            ax = *sp++ - ax;
         }
         else if (op == MUL)
         {
-            /* code */
+            ax = *sp++ * ax;
         }
         else if (op == DIV)
         {
-            /* code */
+            ax = *sp++ / ax;
         }
         else if (op == MOD)
         {
-            /* code */
+            ax = *sp++ % ax;
         }
         else if (op == EXIT)
         {
-            /* code */
+            //退出时打印sp
+            printf("exit(%d)",*sp);
+            return *sp;
         }
         else if (op == OPEN)
         {
-            /* code */
+            //打开源文件
+            ax = open((char *)sp[1],sp[0]);
         }
         else if (op == CLOS)
         {
-            /* code */
+            //关闭源文件
+            ax = close(*sp);
         }
         else if (op == READ)
         {
-            /* code */
+            //读取源文件
+            ax = read(sp[2],(char *)sp[1],*sp);
         }
         else if (op == PRTF)
         {
-            /* code */
+            //printf函数
+            tmp = sp + pc[1];
+            ax = printf((char *)tmp[-1], tmp[-2], tmp[-3], tmp[-4], tmp[-5], tmp[-6]);
         }
         else if (op == MALC)
         {
-            /* code */
+            //malloc函数
+            ax = (int)malloc(*sp);
         }
         else if (op == MSET)
         {
-            /* code */
+            //memset函数
+            ax = (int)memset((char *)sp[2], sp[1], *sp);
         }
         else if (op == MCMP)
         {
-            /* code */
+            //memcmp函数
+            ax = memcmp((char *)sp[2], (char *)sp[1], *sp);
         }
         else
         {
@@ -284,6 +314,17 @@ int main(int argc, char **argv)
     }
     src[i] = 0; // 加入 EOF符号
     close(fd);
+    
+    /* i = 0;
+    text[i++] = IMM;
+    text[i++] = 10;
+    text[i++] = PUSH;
+    text[i++] = IMM;
+    text[i++] = 20;
+    text[i++] = ADD;
+    text[i++] = PUSH;
+    text[i++] = EXIT;
+    pc = text; */
 
     program();
     return eval();
