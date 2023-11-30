@@ -26,11 +26,84 @@ enum { LEA ,IMM ,JMP ,CALL,JZ  ,JNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PUSH,
        OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT };
 
 
+// 标记,类型 ，操作符在最后，按优先顺序排列
+enum {
+  Num = 128, Fun, Sys, Glo, Loc, Id,
+  Char, Else, Enum, If, Int, Return, Sizeof, While,
+  Assign, Cond, Lor, Lan, Or, Xor, And, Eq, Ne, Lt, Gt, Le, Ge, Shl, Shr, Add, Sub, Mul, Div, Mod, Inc, Dec, Brak
+};
+
+/* 符号表定义，采用数组的方式存储，数组大小为9 */
+int token_val;         //当前token的值，用整数来表示
+int *current_id,       //当前的id
+    *symbols;          //符号表指针
+
+// 标识符字段，也就是符号表字段
+enum {Token, Hash, Name, Type, Class, Value, BType, BClass, BValue, IdSize};
+
+
+
 /* 词法分析模块 */
 void next()
 {
-    token = *src++;
-    return;
+    /* token = *src++;
+    return; */
+    char *last_pos;
+    int hash;
+
+    while (token = *src)
+    {
+        ++src;
+        //解析 token;
+        if(token == '\n')
+        {
+            ++line;
+        }
+        else if (token == '#')
+        {
+            //跳过宏定义，编译器不持支宏定义
+            while(*src != 0 && *src != '\n')
+            {
+                src++;
+            }
+        }
+        else if ((token >= 'a' && token <= 'z') || 
+        (token >= 'A' && token <= 'Z') || (token == '_')) {
+
+            // parse identifier
+            last_pos = src - 1;
+            hash = token;
+
+            while ((*src >= 'a' && *src <= 'z') || (*src >= 'A' && *src <= 'Z') 
+            || (*src >= '0' && *src <= '9') || (*src == '_')) {
+                hash = hash * 147 + *src;
+                src++;
+            }
+
+            // look for existing identifier, linear search
+            current_id = symbols;
+            while (current_id[Token]) {
+                if (current_id[Hash] == hash && !memcmp((char *)current_id[Name], last_pos, src - last_pos)) {
+                    //found one, return
+                    token = current_id[Token];
+                    return;
+                }
+                current_id = current_id + IdSize;
+            }
+
+
+            // store new ID
+            current_id[Name] = (int)last_pos;
+            current_id[Hash] = hash;
+            token = current_id[Token] = Id;
+            return;
+        }
+        
+        
+
+
+    }
+    
 }
 
 
