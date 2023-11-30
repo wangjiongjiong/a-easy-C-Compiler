@@ -70,7 +70,7 @@ void next()
         else if ((token >= 'a' && token <= 'z') || 
         (token >= 'A' && token <= 'Z') || (token == '_')) {
 
-            // parse identifier
+            // 解析标识符
             last_pos = src - 1;
             hash = token;
 
@@ -80,19 +80,18 @@ void next()
                 src++;
             }
 
-            // look for existing identifier, linear search
+            // 寻找现有的标识符，线性查找(还在理解)
             current_id = symbols;
             while (current_id[Token]) {
                 if (current_id[Hash] == hash && !memcmp((char *)current_id[Name], last_pos, src - last_pos)) {
-                    //found one, return
+                    //找到一个已有的标识符就返回，看不懂寄寄
                     token = current_id[Token];
                     return;
                 }
                 current_id = current_id + IdSize;
             }
 
-
-            // store new ID
+            // 存储新的id
             current_id[Name] = (int)last_pos;
             current_id[Hash] = hash;
             token = current_id[Token] = Id;
