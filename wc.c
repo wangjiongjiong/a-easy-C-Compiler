@@ -30,7 +30,8 @@ enum { LEA ,IMM ,JMP ,CALL,JZ  ,JNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PUSH,
 enum {
   Num = 128, Fun, Sys, Glo, Loc, Id,
   Char, Else, Enum, If, Int, Return, Sizeof, While,
-  Assign, Cond, Lor, Lan, Or, Xor, And, Eq, Ne, Lt, Gt, Le, Ge, Shl, Shr, Add, Sub, Mul, Div, Mod, Inc, Dec, Brak
+  Assign, Cond, Lor, Lan, Or, Xor, And, Eq, Ne, Lt, Gt, Le, Ge, 
+  Shl, Shr, Add, Sub, Mul, Div, Mod, Inc, Dec, Brak
 };
 
 /* 符号表定义，采用数组的方式存储，数组大小为9 */
@@ -68,26 +69,34 @@ void next()
             }
         }
         else if ((token >= 'a' && token <= 'z') || 
-        (token >= 'A' && token <= 'Z') || (token == '_')) {
+        (token >= 'A' && token <= 'Z') || (token == '_')) 
+        {
 
             // 解析标识符
             last_pos = src - 1;
             hash = token;
 
             while ((*src >= 'a' && *src <= 'z') || (*src >= 'A' && *src <= 'Z') 
-            || (*src >= '0' && *src <= '9') || (*src == '_')) {
+            || (*src >= '0' && *src <= '9') || (*src == '_')) 
+            {
                 hash = hash * 147 + *src;
                 src++;
             }
 
-            // 寻找现有的标识符，线性查找(还在理解)
+            // 寻找现有的标识符，线性查找,有点理解了，但是如果自己复现还是会有点困难
+            //第一次接触编译器开发重要还是入门理解为主
             current_id = symbols;
-            while (current_id[Token]) {
-                if (current_id[Hash] == hash && !memcmp((char *)current_id[Name], last_pos, src - last_pos)) {
+            while (current_id[Token]) 
+            {
+                //判断当先的hash值是否与符号表中存储的一致，并且判断name字段是否相等
+                if (current_id[Hash] == hash && !memcmp((char *)current_id[Name], 
+                last_pos, src - last_pos)) 
+                {
                     //找到一个已有的标识符就返回，看不懂寄寄
                     token = current_id[Token];
                     return;
                 }
+                //相当于找到符号表的下一个符号
                 current_id = current_id + IdSize;
             }
 
@@ -95,6 +104,81 @@ void next()
             current_id[Name] = (int)last_pos;
             current_id[Hash] = hash;
             token = current_id[Token] = Id;
+            return;
+        }
+        else if (token >= '0' && token <= '9') 
+        {
+            //针对三种进制进行解析，10进制(123) 16进制(0x123) 8进制(017)
+            token_val = token - '0';
+            if (token_val > 0) 
+            {
+                // 10进制开始于1-9
+                while (*src >= '0' && *src <= '9') 
+                {
+                    token_val = token_val*10 + *src++ - '0';
+                }
+            } 
+            else 
+            {
+                // 开始字符为0
+                if (*src == 'x' || *src == 'X') 
+                {
+                    //16进制
+                    token = *++src;
+                    while ((token >= '0' && token <= '9') || (token >= 'a' && token <= 'f') 
+                    || (token >= 'A' && token <= 'F')) 
+                    {
+                        token_val = token_val * 16 + (token & 15) + (token >= 'A' ? 9 : 0);
+                        token = *++src;
+                    }
+                } 
+                else 
+                {
+                    // 8进制
+                    while (*src >= '0' && *src <= '7') 
+                    {
+                        token_val = token_val*8 + *src++ - '0';
+                    }
+                }
+            }
+
+            token = Num;
+            return;
+        }
+        else if (token == '"' || token == '\'') 
+        {
+            // parse string literal, currently, the only supported escape
+            // character is '\n', store the string literal into data.
+            last_pos = data;
+            while (*src != 0 && *src != token) 
+            {
+                token_val = *src++;
+                if (token_val == '\\') 
+                {
+                    // escape character
+                    token_val = *src++;
+                    if (token_val == 'n') 
+                    {
+                        token_val = '\n';
+                    }
+                }
+
+                if (token == '"') 
+                {
+                    *data++ = token_val;
+                }
+            }
+
+            src++;
+            // if it is a single character, return Num token
+            if (token == '"') 
+            {
+                token_val = (int)last_pos;
+            } else 
+            {
+                token = Num;
+            }
+
             return;
         }
         
