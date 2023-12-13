@@ -43,6 +43,11 @@ int *current_id,       //当前的id
 enum {Token, Hash, Name, Type, Class, Value, BType, BClass, BValue, IdSize};
 
 
+// 函数变量类型
+enum { CHAR, INT, PTR };
+int *idmain;           //主函数指针
+
+
 
 /* 词法分析模块 */
 void next()
@@ -610,6 +615,28 @@ int main(int argc, char **argv)
     bp = sp = (int *)((int)stack + poolsize);
     ax = 0;
 
+    src = "char else enum if int return sizeof while "
+          "open read close printf malloc memset memcmp exit void main";
+
+     // 将关键字添加到符号表
+    i = Char;
+    while (i <= While) {
+        next();
+        current_id[Token] = i++;
+    }
+
+    // 将库添加到符号表
+    i = OPEN;
+    while (i <= EXIT) {
+        next();
+        current_id[Class] = Sys;
+        current_id[Type] = INT;
+        current_id[Value] = i++;
+    }
+
+    next(); current_id[Token] = Char; // 处理空类型
+    next(); idmain = current_id; // 跟踪main函数
+
     /* open打开想要读取的源代码 */
     if ((fd = open(*argv, 0)) < 0) 
     {
@@ -642,7 +669,7 @@ int main(int argc, char **argv)
     text[i++] = ADD;
     text[i++] = PUSH;
     text[i++] = EXIT;
-    pc = text; */
+    pc = text; */ 
 
     program();
     return eval();
