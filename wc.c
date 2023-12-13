@@ -147,15 +147,15 @@ void next()
         }
         else if (token == '"' || token == '\'') 
         {
-            // parse string literal, currently, the only supported escape
-            // character is '\n', store the string literal into data.
+            // 解析字符串文字，目前唯一支持的转义
+            // 字符为“\n”，将字符串文字存储到数据中。
             last_pos = data;
             while (*src != 0 && *src != token) 
             {
                 token_val = *src++;
                 if (token_val == '\\') 
                 {
-                    // escape character
+                    // 转义字符，这里我们只支持了\n这一种转义字符
                     token_val = *src++;
                     if (token_val == 'n') 
                     {
@@ -170,7 +170,7 @@ void next()
             }
 
             src++;
-            // if it is a single character, return Num token
+            // 如果是单个字符，则返回 Num token
             if (token == '"') 
             {
                 token_val = (int)last_pos;
@@ -181,9 +181,171 @@ void next()
 
             return;
         }
-        
-        
-
+        else if (token == '/') 
+        {
+            if (*src == '/') 
+            {
+                // 跳过
+                while (*src != 0 && *src != '\n') 
+                {
+                    ++src;
+                }
+            } 
+            else 
+            {
+                // 除法符号
+                token = Div;
+                return;
+            }
+        }
+        else if (token == '=') 
+        {
+            // parse '==' and '='
+            if (*src == '=') 
+            {
+                src ++;
+                token = Eq;
+            } 
+            else 
+            {
+                token = Assign;
+            }
+            return;
+        }
+        else if (token == '+') 
+        {
+            // parse '+' and '++'
+            if (*src == '+') 
+            {
+                src ++;
+                token = Inc;
+            } 
+            else 
+            {
+                token = Add;
+            }
+            return;
+        }
+        else if (token == '-') 
+        {
+            // parse '-' and '--'
+            if (*src == '-') 
+            {
+                src ++;
+                token = Dec;
+            } 
+            else 
+            {
+                token = Sub;
+            }
+            return;
+        }
+        else if (token == '!') 
+        {
+            // parse '!='
+            if (*src == '=') 
+            {
+                src++;
+                token = Ne;
+            }
+            return;
+        }
+        else if (token == '<') 
+        {
+            // parse '<=', '<<' or '<'
+            if (*src == '=') 
+            {
+                src ++;
+                token = Le;
+            } 
+            else if (*src == '<') 
+            {
+                src ++;
+                token = Shl;
+            } 
+            else 
+            {
+                token = Lt;
+            }
+            return;
+        }
+        else if (token == '>') 
+        {
+            // parse '>=', '>>' or '>'
+            if (*src == '=') 
+            {
+                src ++;
+                token = Ge;
+            } 
+            else if (*src == '>') 
+            {
+                src ++;
+                token = Shr;
+            } else 
+            {
+                token = Gt;
+            }
+            return;
+        }
+        else if (token == '|') 
+        {
+            // parse '|' or '||'
+            if (*src == '|') 
+            {
+                src ++;
+                token = Lor;
+            } 
+            else 
+            {
+                token = Or;
+            }
+            return;
+        }
+        else if (token == '&') 
+        {
+            // parse '&' and '&&'
+            if (*src == '&') 
+            {
+                src ++;
+                token = Lan;
+            } 
+            else 
+            {
+                token = And;
+            }
+            return;
+        }
+        else if (token == '^') 
+        {
+            token = Xor;
+            return;
+        }
+        else if (token == '%') 
+        {
+            token = Mod;
+            return;
+        }
+        else if (token == '*') 
+        {
+            token = Mul;
+            return;
+        }
+        else if (token == '[') 
+        {
+            token = Brak;
+            return;
+        }
+        else if (token == '?') 
+        {
+            token = Cond;
+            return;
+        }
+        else if (token == '~' || token == ';' || token == '{' || token == '}' 
+        || token == '(' || token == ')' || token == ']' || token == ',' || token == ':') 
+        {
+            // directly return the character as token;
+            return;
+        }
 
     }
     
