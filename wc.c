@@ -200,7 +200,7 @@ void next()
         }
         else if (token == '=') 
         {
-            // parse '==' and '='
+            // 解析==和=
             if (*src == '=') 
             {
                 src ++;
@@ -214,7 +214,7 @@ void next()
         }
         else if (token == '+') 
         {
-            // parse '+' and '++'
+            // 解析++和+
             if (*src == '+') 
             {
                 src ++;
@@ -228,7 +228,7 @@ void next()
         }
         else if (token == '-') 
         {
-            // parse '-' and '--'
+            // 解析--和-
             if (*src == '-') 
             {
                 src ++;
@@ -242,7 +242,7 @@ void next()
         }
         else if (token == '!') 
         {
-            // parse '!='
+            // 解析 !=
             if (*src == '=') 
             {
                 src++;
@@ -252,7 +252,7 @@ void next()
         }
         else if (token == '<') 
         {
-            // parse '<=', '<<' or '<'
+            // 解析<=,<<,<
             if (*src == '=') 
             {
                 src ++;
@@ -271,7 +271,7 @@ void next()
         }
         else if (token == '>') 
         {
-            // parse '>=', '>>' or '>'
+            // 解析>=,>>,>
             if (*src == '=') 
             {
                 src ++;
@@ -289,7 +289,7 @@ void next()
         }
         else if (token == '|') 
         {
-            // parse '|' or '||'
+            // 解析||和|
             if (*src == '|') 
             {
                 src ++;
@@ -303,7 +303,7 @@ void next()
         }
         else if (token == '&') 
         {
-            // parse '&' and '&&'
+            // 接卸&&和&
             if (*src == '&') 
             {
                 src ++;
@@ -343,7 +343,7 @@ void next()
         else if (token == '~' || token == ';' || token == '{' || token == '}' 
         || token == '(' || token == ')' || token == ']' || token == ',' || token == ':') 
         {
-            // directly return the character as token;
+            // 这些字符直接返回作为token
             return;
         }
 
